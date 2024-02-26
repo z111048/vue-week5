@@ -1,5 +1,3 @@
-import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
-
 const apiUrl = "https://vue3-course-api.hexschool.io/v2/";
 const apiPath = "james9527";
 
@@ -19,7 +17,7 @@ const userModal = {
       this.productModal.hide();
     },
   },
-  whtch: {
+  watch: {
     tempProduct() {
       this.qty = 1;
     },
@@ -30,7 +28,7 @@ const userModal = {
   },
 };
 
-const app = createApp({
+const app = Vue.createApp({
   data() {
     return {
       products: [],
@@ -39,8 +37,18 @@ const app = createApp({
       status: {
         addCartLoding: "",
         cartQtyLoding: "",
+        cartDelLoding: "",
       },
       carts: {},
+      form: {
+        user: {
+          name: "",
+          email: "",
+          tel: "",
+          address: "",
+        },
+        message: "",
+      },
     };
   },
   methods: {
@@ -113,6 +121,20 @@ const app = createApp({
           console.error(err);
         });
     },
+    removeCarAll() {
+      const api = `${apiUrl}api/${apiPath}/carts`;
+      this.status.cartDelLoding = "true";
+      axios
+        .delete(api)
+        .then((res) => {
+          // console.log(res);
+          this.status.cartDelLoding = "";
+          this.getCart();
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
     getCart() {
       const api = `${apiUrl}api/${apiPath}/cart`;
       axios
@@ -126,6 +148,22 @@ const app = createApp({
           console.error(err);
         });
     },
+    createOrder() {
+      const url = `${apiUrl}/api/${apiPath}/order`;
+      const order = this.form;
+      console.log(order);
+      axios
+        .post(url, { data: order })
+        .then((res) => {
+          alert(res.data.message);
+          this.$refs.form.resetForm();
+          this.form.message = "";
+          this.getCart();
+        })
+        .catch((err) => {
+          alert(err.response.data.message);
+        });
+    },
   },
   components: {
     userModal,
@@ -134,6 +172,30 @@ const app = createApp({
     this.getProducts();
     this.getCart();
   },
+});
+
+// 表單驗證元件
+app.component("VForm", VeeValidate.Form);
+app.component("VField", VeeValidate.Field);
+app.component("ErrorMessage", VeeValidate.ErrorMessage);
+
+VeeValidate.defineRule("email", VeeValidateRules["email"]);
+VeeValidate.defineRule("required", VeeValidateRules["required"]);
+
+// 全部加入
+Object.keys(VeeValidateRules).forEach((rule) => {
+  if (rule !== "default") {
+    VeeValidate.defineRule(rule, VeeValidateRules[rule]);
+  }
+});
+
+// 讀取外部的資源
+VeeValidateI18n.loadLocaleFromURL("./zh_TW.json");
+
+// Activate the locale
+VeeValidate.configure({
+  generateMessage: VeeValidateI18n.localize("zh_TW"),
+  validateOnInput: true, // 調整為：輸入文字時，就立即進行驗證
 });
 
 app.mount("#app");

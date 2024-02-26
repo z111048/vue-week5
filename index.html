@@ -45,13 +45,13 @@
               <tr v-for="product in products" :key="product.key">
                 <td style="width: 200px">
                   <div
-                    style="
-                      height: 100px;
-                      background-size: cover;
-                      background-position: center;
-                    "
-                    :style="
-                    {backgroundImage:`url(${product.imageUrl})`}"
+                    :style="{
+                      height: '100px',
+                      backgroundSize: 'contain',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundImage: `url(${product.imageUrl})`
+                    }"
                   ></div>
                 </td>
                 <td>{{product.title }}</td>
@@ -71,7 +71,7 @@
                       class="btn btn-outline-secondary"
                       @click="openModal(product)"
                     >
-                      <i class="fas fa-spinner fa-pulse"></i>
+                      <!-- <i class="fas fa-spinner fa-pulse"></i> -->
                       查看更多
                     </button>
                     <button
@@ -94,7 +94,16 @@
           </table>
           <!-- 購物車列表 -->
           <div class="text-end">
-            <button class="btn btn-outline-danger" type="button">
+            <button
+              class="btn btn-outline-danger"
+              type="button"
+              @click="removeCarAll"
+            >
+              <span
+                class="spinner-border spinner-border-sm"
+                aria-hidden="true"
+                v-if="status.cartDelLoding==='true'"
+              ></span>
               清空購物車
             </button>
           </div>
@@ -137,7 +146,7 @@
                           @change="changeCartQty(cart, cart.qty)"
                         />
                         <span class="input-group-text" id="basic-addon2"
-                          >{{ }}</span
+                          >{{ cart.product.unit}}</span
                         >
                       </div>
                     </div>
@@ -161,7 +170,7 @@
             </tfoot>
           </table>
         </div>
-        <!-- <div class="my-5 row justify-content-center">
+        <div class="my-5 row justify-content-center">
           <v-form ref="form" class="col-md-6" v-slot="{ errors }">
             <div class="mb-3">
               <label for="email" class="form-label">Email</label>
@@ -172,6 +181,8 @@
                 class="form-control"
                 :class="{ 'is-invalid': errors['email'] }"
                 placeholder="請輸入 Email"
+                rules="email|required"
+                v-model="form.user.email"
               ></v-field>
               <error-message
                 name="email"
@@ -189,6 +200,7 @@
                 :class="{ 'is-invalid': errors['姓名'] }"
                 placeholder="請輸入姓名"
                 rules="required"
+                v-model="form.user.name"
               ></v-field>
               <error-message
                 name="姓名"
@@ -205,6 +217,7 @@
                 class="form-control"
                 :class="{ 'is-invalid': errors['電話'] }"
                 placeholder="請輸入電話"
+                v-model="form.user.tel"
               ></v-field>
               <error-message
                 name="電話"
@@ -222,6 +235,7 @@
                 :class="{ 'is-invalid': errors['地址'] }"
                 placeholder="請輸入地址"
                 rules="required"
+                v-model="form.user.address"
               ></v-field>
               <error-message
                 name="地址"
@@ -236,13 +250,16 @@
                 class="form-control"
                 cols="30"
                 rows="10"
+                v-model="form.message"
               ></textarea>
             </div>
             <div class="text-end">
-              <button type="submit" class="btn btn-danger">送出訂單</button>
+              <button type="button" class="btn btn-danger" @click="createOrder">
+                送出訂單
+              </button>
             </div>
           </v-form>
-        </div> -->
+        </div>
       </div>
     </div>
     <script type="text/x-template" id="userProductModal">
@@ -306,10 +323,14 @@
       integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc"
       crossorigin="anonymous"
     ></script>
-    <!-- <script src="https://unpkg.com/vue@next"></script> -->
-    <!-- <script src="https://unpkg.com/vee-validate@next"></script>
-    <script src="https://unpkg.com/@vee-validate/i18n@4.1.0"></script>
-    <script src="https://unpkg.com/@vee-validate/rules"></script> -->
+    <script src="https://unpkg.com/vue@next"></script>
+    <!-- <script src="https://unpkg.com/vee-validate@next"></script> -->
+    <!-- <script src="https://unpkg.com/@vee-validate/i18n@4.1.0"></script> -->
+    <!-- <script src="https://unpkg.com/@vee-validate/rules"></script> -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vee-validate/4.12.4/vee-validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@vee-validate/rules@4.12.4/dist/vee-validate-rules.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@vee-validate/i18n@4.12.4/dist/vee-validate-i18n.min.js"></script>
     <script src="./card.js" type="module"></script>
   </body>
 </html>
